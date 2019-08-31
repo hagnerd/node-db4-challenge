@@ -2,7 +2,8 @@ const router = require("express").Router();
 const {
   getRecipeById,
   getRecipes,
-  getShoppingList
+  getShoppingList,
+  getInstructions
 } = require("../controllers/recipe-book");
 
 async function validateRecipeId(req, res, next) {
@@ -59,6 +60,22 @@ router.get("/:id/shoppingList", validateRecipeId, async (req, res) => {
     });
   }
 });
-router.get("/:id/instructions", validateRecipeId, (req, res) => {});
+
+router.get("/:id/instructions", validateRecipeId, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const instructions = await getInstructions(id);
+
+    res.json({
+      instructions
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: "internal server error",
+      message: error.message
+    });
+  }
+});
 
 module.exports = router;
